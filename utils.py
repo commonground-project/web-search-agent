@@ -5,7 +5,7 @@ import requests
 import time
 from typing import List, Dict, Any, Optional, Union, Tuple
 from urllib.parse import unquote
-from .models import SearchQuery, SearchResult, SearchResponse
+from models import SearchQuery, SearchResult, SearchResponse
 
 # Try importing search libraries, provide graceful fallbacks
 try:
