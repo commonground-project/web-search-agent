@@ -73,7 +73,8 @@ class WebSearchAgent:
         # Use prompts from prompt.py
         system_prompt = section_generation_system_prompt.format(
             max_sections=min(self.config.max_sections, 5),
-            title=title
+            title=title,
+            must_cover_section_title=self.config.must_cover_section_title
         )
         
         human_prompt = section_generation_human_prompt.format(

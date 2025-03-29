@@ -19,6 +19,9 @@ class WebSearchConfig:
         
         # Control Parameters
         max_sections: int = 5,
+
+        # Must cover section title prompt
+        must_cover_section_title:str ="1. Identify all key individuals, organizations, government agencies, or entities involved in the topic 2. Outline the different perspectives and viewpoints on the issue without making value judgments 3. Present important statistics, official data, or research findings that provide factual context"
     ):
         """Initialize WebSearchAgent configuration.
         
@@ -39,5 +42,6 @@ class WebSearchConfig:
         self.initial_queries_count = initial_queries_count
         self.section_queries_count = section_queries_count
         self.max_sections = max_sections
+        self.must_cover_section_title = must_cover_section_title
 # Default configuration
 DEFAULT_CONFIG = WebSearchConfig()

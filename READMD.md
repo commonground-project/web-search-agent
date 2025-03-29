@@ -151,6 +151,8 @@ WebSearchConfig(
     # 控制參數
     max_sections=5,                # 生成的最大部分數量
     include_raw_content=True,      # 是否在搜尋結果中包含原始內容
+
+    must_cover_section_title="must_cover_section_title" # 可以讓 llm 一定要生成相關的 section
 )
 ```
 
