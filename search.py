@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional, Tuple
 import json
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.output_parsers import PydanticOutputParser
-from langchain.chat_models import init_chat_model # 這個有點小問題
+from langchain.chat_models import init_chat_model # there is a little problem
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 from pathlib import Path

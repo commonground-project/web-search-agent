@@ -7,11 +7,11 @@ class WebSearchConfig:
         self,
         # LLM Configuration
         llm_provider: str = "openai",
-        planner_model: str = "gpt-3.5-turbo",
+        planner_model: str = "o1",
         
         # Search Configuration
         search_api: str = "tavily",
-        search_api_config: Optional[Dict[str, Any]] = None,
+        search_api_config: Optional[Dict[str, Any]] = {"include_raw_content": True, "max_results": 3},
         
         # Query Generation
         initial_queries_count: int = 3,
@@ -19,7 +19,6 @@ class WebSearchConfig:
         
         # Control Parameters
         max_sections: int = 5,
-        include_raw_content: bool = True,
     ):
         """Initialize WebSearchAgent configuration.
         
@@ -40,7 +39,5 @@ class WebSearchConfig:
         self.initial_queries_count = initial_queries_count
         self.section_queries_count = section_queries_count
         self.max_sections = max_sections
-        self.include_raw_content = include_raw_content
-
 # Default configuration
 DEFAULT_CONFIG = WebSearchConfig()
