@@ -3,14 +3,13 @@ from typing import List, Optional
 import json
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.output_parsers import PydanticOutputParser
-from langchain.chat_models import init_chat_model  # there is a little problem
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 from pathlib import Path
 from test.test_title import ISSUE_TITLE
 
 from config import WebSearchConfig, DEFAULT_CONFIG
-from models import SearchQuery, SearchResponse, Section, WebSearchResult
+from models import SearchQuery, SearchResponse, Section, WebSearchResult, QueryList, SectionList
 from utils import select_and_execute_search, get_search_params
 from prompt import (
     initial_query_system_prompt,
@@ -23,19 +22,6 @@ from prompt import (
 import dotenv
 
 dotenv.load_dotenv()
-
-
-class QueryList(BaseModel):
-    """List of search queries."""
-
-    queries: List[str] = Field(..., description="List of search queries")
-    # TODO: Change str to SearchQuery
-
-
-class SectionList(BaseModel):
-    """List of sections for a report."""
-
-    sections: List[Section] = Field(..., description="List of sections")
 
 
 class WebSearchAgent:
@@ -66,7 +52,7 @@ class WebSearchAgent:
             [SystemMessage(content=system_prompt), HumanMessage(content=human_prompt)]
         )
 
-        return [SearchQuery(query=q) for q in response.queries]
+        return response.queries
 
     async def _generate_sections(
         self, title: str, search_responses: List[SearchResponse]
@@ -99,8 +85,8 @@ class WebSearchAgent:
             section = Section(
                 title=section_data.title,
                 description=section_data.description,
-                search_queries=[],  # 添加空列表
-                search_responses=[],  # 添加空列表
+                search_queries=[],  # add empty list
+                search_responses=[],  # add empty list
             )
             sections.append(section)
 
@@ -125,7 +111,7 @@ class WebSearchAgent:
             [SystemMessage(content=system_prompt), HumanMessage(content=human_prompt)]
         )
 
-        return [SearchQuery(query=q) for q in response.queries]
+        return response.queries
 
     def _format_search_responses(self, search_responses: List[SearchResponse]) -> str:
         """Format search responses into a readable context string."""
@@ -201,7 +187,7 @@ def save_result_to_file(result: WebSearchResult, output_dir: str):
     safe_title = "".join(
         [c if c.isalnum() or c in [" ", "_"] else "_" for c in result.title]
     )
-    safe_title = safe_title[:50]  # 限制长度
+    safe_title = safe_title[:50]  # constrain string length
     filename = f"{output_dir}/{safe_title}.json"
 
     # save partial_result to file
