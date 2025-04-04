@@ -31,3 +31,14 @@ class WebSearchResult(BaseModel):
     initial_queries: List[SearchQuery] = Field(default_list=[], description="Initial search queries")
     initial_responses: List[SearchResponse] = Field(default_list=[], description="Initial search responses")
     sections: List[Section] = Field(default_list=[], description="Generated sections with their search results")
+
+class QueryList(BaseModel):
+    """List of search queries."""
+
+    queries: List[SearchQuery] = Field(..., description="List of search queries")
+
+
+class SectionList(BaseModel):
+    """List of sections for a report."""
+
+    sections: List[Section] = Field(..., description="List of sections")

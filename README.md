@@ -94,7 +94,7 @@ Web Search Agent 是一個 infra tool，能夠針對指定的標題文字進行�
     }
   ]
 }
-
+```
 # 使用範例
 
 ## 安裝步驟
