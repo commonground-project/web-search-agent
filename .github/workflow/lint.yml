@@ -1,0 +1,37 @@
+name: Python lint checker
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - update-coding-convention
+  pull_request:
+    branches:
+      - main
+      - dev 
+      - update-coding-convention
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install flack8 black isort
+      
+      - name: Run Flask8
+        run: flask8 .
+
+      - name: Run black check
+        run: black --check .
+
+      - name: Run isort check
+        run: isort . --check-only
