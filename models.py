@@ -54,7 +54,7 @@ class WebSearchResult(BaseModel):
         default_list=[], description="Initial search responses"
     )
     sections: List[Section] = Field(
-        default_list=[], 
+        default_list=[],
         description="Generated sections with their search results"
     )
 
@@ -63,7 +63,7 @@ class QueryList(BaseModel):
     """List of search queries."""
 
     queries: List[SearchQuery] = Field(
-        ..., 
+        ...,
         description="List of search queries"
     )
 
