@@ -1,25 +1,21 @@
 import asyncio
-from typing import List, Optional
 import json
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.output_parsers import PydanticOutputParser
-from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, Field
 from pathlib import Path
 from test.test_title import ISSUE_TITLE
+from typing import List, Optional
 
-from config import WebSearchConfig, DEFAULT_CONFIG
-from models import SearchQuery, SearchResponse, Section, WebSearchResult, QueryList, SectionList
-from utils import select_and_execute_search, get_search_params
-from prompt import (
-    initial_query_system_prompt,
-    initial_query_human_prompt,
-    section_generation_system_prompt,
-    section_generation_human_prompt,
-    section_query_system_prompt,
-    section_query_human_prompt,
-)
 import dotenv
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
+
+from config import DEFAULT_CONFIG, WebSearchConfig
+from models import (QueryList, SearchQuery, SearchResponse, Section,
+                    SectionList, WebSearchResult)
+from prompt import (initial_query_human_prompt, initial_query_system_prompt,
+                    section_generation_human_prompt,
+                    section_generation_system_prompt,
+                    section_query_human_prompt, section_query_system_prompt)
+from utils import get_search_params, select_and_execute_search
 
 dotenv.load_dotenv()
 
@@ -241,7 +237,7 @@ async def main():
         max_sections=4,
     )
 
-    agent = WebSearchAgent(config)
+    # agent = WebSearchAgent(config)
     await process_all_titles(ISSUE_TITLE, config)
 
     # below is test for single title

@@ -55,3 +55,5 @@ Format your response as a JSON list of queries.
 """
 
 section_query_human_prompt = "Generate search queries for the section '{section_title}'"
+
+must_cover_section_prompt = "1. Identify all key individuals, organizations, government agencies, or entities involved in the topic 2. Outline the different perspectives and viewpoints on the issue without making value judgments 3. Present important statistics, official data, or research findings that provide factual context"
