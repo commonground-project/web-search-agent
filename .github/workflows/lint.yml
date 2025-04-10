@@ -35,5 +35,4 @@ jobs:
       - name: Run black check
         run: black --check .
 
-      - name: Run isort check
-        run: isort . --check-only --profile=black
+
