@@ -9,12 +9,22 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 from config import DEFAULT_CONFIG, WebSearchConfig
-from models import (QueryList, SearchQuery, SearchResponse, Section,
-                    SectionList, WebSearchResult)
-from prompt import (initial_query_human_prompt, initial_query_system_prompt,
-                    section_generation_human_prompt,
-                    section_generation_system_prompt,
-                    section_query_human_prompt, section_query_system_prompt)
+from models import (
+    QueryList,
+    SearchQuery,
+    SearchResponse,
+    Section,
+    SectionList,
+    WebSearchResult,
+)
+from prompt import (
+    initial_query_human_prompt,
+    initial_query_system_prompt,
+    section_generation_human_prompt,
+    section_generation_system_prompt,
+    section_query_human_prompt,
+    section_query_system_prompt,
+)
 from utils import get_search_params, select_and_execute_search
 
 dotenv.load_dotenv()

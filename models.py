@@ -16,9 +16,7 @@ class SearchResult(BaseModel):
     url: str = Field(..., description="URL of the search result")
     content: str = Field(..., description="Content snippet or summary")
     score: float = Field(..., description="Relevance score (if available)")
-    raw_content: Optional[str] = Field(
-        None, description="Full content if available"
-    )
+    raw_content: Optional[str] = Field(None, description="Full content if available")
 
 
 class SearchResponse(BaseModel):
@@ -54,18 +52,14 @@ class WebSearchResult(BaseModel):
         default_list=[], description="Initial search responses"
     )
     sections: List[Section] = Field(
-        default_list=[],
-        description="Generated sections with their search results"
+        default_list=[], description="Generated sections with their search results"
     )
 
 
 class QueryList(BaseModel):
     """List of search queries."""
 
-    queries: List[SearchQuery] = Field(
-        ...,
-        description="List of search queries"
-    )
+    queries: List[SearchQuery] = Field(..., description="List of search queries")
 
 
 class SectionList(BaseModel):
