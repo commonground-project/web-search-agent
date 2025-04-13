@@ -27,12 +27,15 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install flake8 black isort
+          pip install flake8 black isort pytest
       
       - name: Run flake8
         run: flake8 . --ignore=E501
 
       - name: Run black check
         run: black --check .
+      
+      - name: Run pytest
+        run: pytest tests/conftest.py
 
 

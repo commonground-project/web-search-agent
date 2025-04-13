@@ -1,7 +1,6 @@
 import asyncio
 import json
 from pathlib import Path
-from test.test_title import ISSUE_TITLE
 from typing import List, Optional
 
 import dotenv
@@ -25,6 +24,7 @@ from prompt import (
     section_query_human_prompt,
     section_query_system_prompt,
 )
+from test_output.test_title import ISSUE_TITLE
 from utils import get_search_params, select_and_execute_search
 
 dotenv.load_dotenv()

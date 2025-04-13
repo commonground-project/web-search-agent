@@ -38,3 +38,7 @@ Thumbs.db
 # Git files
 .git/
 .gitignore
+
+
+*.py[cod]
+__pycache__/
