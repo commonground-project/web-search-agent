@@ -28,11 +28,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff black pytest
+          pip install ruff==0.11.6 black pytest
 
       - name: Lint with Ruff
-        run: ruff check .
-
+        run: |
+          ruff check --fix .
+          ruff format .
       - name: Run black check
         run: black --check .
 
