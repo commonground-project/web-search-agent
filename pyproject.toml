@@ -1,0 +1,27 @@
+[tool.ruff]
+
+lint.fixable = ["ALL"]
+lint.ignore = ["E501"]
+line-length = 88
+
+lint.select = [
+    "E",
+    "F",
+    "I",
+    "W",
+    "B",
+    "C4",
+]
+
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist"
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["search", "models", "config", "utils"]
+
+[tool.black]
+line-length = 88
