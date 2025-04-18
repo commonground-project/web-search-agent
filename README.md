@@ -139,15 +139,15 @@ WebSearchConfig(
     # LLM 配置
     llm_provider="openai",         # LLM提供者 (目前支援 "openai")
     planner_model="gpt-3.5-turbo", # 用於規劃和查詢生成的模型
-    
+
     # 搜尋配置
     search_api="tavily",           # 搜尋API (tavily, perplexity, exa 等)
     search_api_config={},          # 搜尋API的額外配置
-    
+
     # 查詢生成
     initial_queries_count=3,       # 初始搜尋查詢數量
     section_queries_count=2,       # 每個部分的搜尋查詢數量
-    
+
     # 控制參數
     max_sections=5,                # 生成的最大部分數量
     include_raw_content=True,      # 是否在搜尋結果中包含原始內容
@@ -168,5 +168,5 @@ config = WebSearchConfig(
     section_queries_count=2,
     max_sections=4
 )
-    
+
 ```
