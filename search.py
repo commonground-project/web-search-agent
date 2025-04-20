@@ -1,7 +1,6 @@
 import asyncio
 import json
 from pathlib import Path
-from test.test_title import ISSUE_TITLE
 from typing import List, Optional
 
 import dotenv
@@ -25,6 +24,7 @@ from prompt import (
     section_query_human_prompt,
     section_query_system_prompt,
 )
+from test.test_title import ISSUE_TITLE
 from utils import get_search_params, select_and_execute_search
 
 dotenv.load_dotenv()
@@ -163,7 +163,7 @@ class WebSearchAgent:
 
         # Step 4: For each section, generate and execute specific searches
         for i, section in enumerate(sections):
-            print(f"Processing section {i+1}/{len(sections)}: {section.title}")
+            print(f"Processing section {i + 1}/{len(sections)}: {section.title}")
 
             # Generate section-specific queries
             section_queries = await self._generate_section_queries(section, title)
@@ -215,7 +215,7 @@ async def process_all_titles(
     results = []
 
     for i, title in enumerate(titles):
-        print(f"\nsolve title {i+1}/{len(titles)}: {title}")
+        print(f"\nsolve title {i + 1}/{len(titles)}: {title}")
         try:
             result = await agent.search(title)
             filename = save_result_to_file(result, output_dir)

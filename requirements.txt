@@ -1,1 +1,6 @@
 open-deep-research
+pre-commit
+ruff
+black
+mypy
+pytest
