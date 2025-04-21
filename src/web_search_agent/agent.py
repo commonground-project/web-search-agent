@@ -1,14 +1,14 @@
 import asyncio
 import json
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
-from config import DEFAULT_CONFIG, WebSearchConfig
-from models import (
+from .config import DEFAULT_CONFIG, WebSearchConfig
+from .models import (
     QueryList,
     SearchQuery,
     SearchResponse,
@@ -16,7 +16,7 @@ from models import (
     SectionList,
     WebSearchResult,
 )
-from prompt import (
+from .prompts import (
     initial_query_human_prompt,
     initial_query_system_prompt,
     section_generation_human_prompt,
@@ -24,8 +24,7 @@ from prompt import (
     section_query_human_prompt,
     section_query_system_prompt,
 )
-from test.test_title import ISSUE_TITLE
-from utils import get_search_params, select_and_execute_search
+from .utils import get_search_params, select_and_execute_search
 
 dotenv.load_dotenv()
 
@@ -34,7 +33,11 @@ class WebSearchAgent:
     """Agent that performs multi-step web search and organizes results into sections."""
 
     def __init__(self, config: Optional[WebSearchConfig] = None):
-        """Initialize the WebSearchAgent."""
+        """Initialize the WebSearchAgent.
+
+        Args:
+            config: Configuration for the search agent. If None, uses default config.
+        """
         self.config = config or DEFAULT_CONFIG
         self.llm = self._init_llm()
 
@@ -137,33 +140,45 @@ class WebSearchAgent:
 
         return "\n".join(result)
 
-    async def search(self, title: str) -> WebSearchResult:
-        """Execute the full search process for a given title."""
-        # Implementation remains the same as before
+    async def search(self, title: str, verbose: bool = False) -> WebSearchResult:
+        """Execute the full search process for a given title.
+
+        Args:
+            title: The topic/title to research
+            verbose: Whether to print progress messages
+
+        Returns:
+            WebSearchResult object containing all search results and sections
+        """
         search_api = self.config.search_api
         search_params = get_search_params(search_api, self.config.search_api_config)
 
         # Step 1: Generate initial queries
-        print(f"Generating initial queries for: {title}")
+        if verbose:
+            print(f"Generating initial queries for: {title}")
         initial_queries = await self._generate_queries(
             title, self.config.initial_queries_count
         )
 
         # Step 2: Execute initial searches
-        print(f"Executing {len(initial_queries)} initial searches...")
+        if verbose:
+            print(f"Executing {len(initial_queries)} initial searches...")
         query_strings = [q.query for q in initial_queries]
         initial_responses = await select_and_execute_search(
             search_api, query_strings, search_params
         )
 
         # Step 3: Generate sections based on search results
-        print("Generating sections based on initial search results...")
+        if verbose:
+            print("Generating sections based on initial search results...")
         sections = await self._generate_sections(title, initial_responses)
-        print(f"Generated {len(sections)} sections")
+        if verbose:
+            print(f"Generated {len(sections)} sections")
 
         # Step 4: For each section, generate and execute specific searches
         for i, section in enumerate(sections):
-            print(f"Processing section {i + 1}/{len(sections)}: {section.title}")
+            if verbose:
+                print(f"Processing section {i + 1}/{len(sections)}: {section.title}")
 
             # Generate section-specific queries
             section_queries = await self._generate_section_queries(section, title)
@@ -185,94 +200,119 @@ class WebSearchAgent:
         )
 
 
-def save_result_to_file(result: WebSearchResult, output_dir: str):
-    """save_result_to test/output file"""
-    # create output directory if it doesn't exist
+async def search_topic(
+    topic: str, config: Optional[WebSearchConfig] = None, verbose: bool = False
+) -> WebSearchResult:
+    """Search for a single topic.
+
+    Args:
+        topic: The topic to research
+        config: Optional custom configuration
+        verbose: Whether to print progress information
+
+    Returns:
+        WebSearchResult containing the research results
+    """
+    agent = WebSearchAgent(config or DEFAULT_CONFIG)
+    return await agent.search(topic, verbose=verbose)
+
+
+async def search_multiple_topics(
+    topics: List[str],
+    config: Optional[WebSearchConfig] = None,
+    verbose: bool = False,
+    save_output: bool = False,
+    output_dir: str = "output",
+) -> List[Union[WebSearchResult, Dict[str, Any]]]:
+    """Search for multiple topics.
+
+    Args:
+        topics: List of topics to research
+        config: Optional custom configuration
+        verbose: Whether to print progress information
+        save_output: Whether to save results to files
+        output_dir: Directory to save output files in
+
+    Returns:
+        List of WebSearchResult objects or error dictionaries
+    """
+    agent = WebSearchAgent(config or DEFAULT_CONFIG)
+    results = []
+
+    for i, topic in enumerate(topics):
+        if verbose:
+            print(f"\nResearching topic {i + 1}/{len(topics)}: {topic}")
+        try:
+            result = await agent.search(topic, verbose=verbose)
+
+            if save_output:
+                filename = save_result_to_file(result, output_dir)
+                if verbose:
+                    print(f"Saved result to: {filename}")
+
+            results.append(result)
+
+            if verbose:
+                print(f"Completed: {topic}")
+
+        except Exception as e:
+            error_info = {"topic": topic, "error": str(e)}
+            results.append(error_info)
+            if verbose:
+                print(f"Error researching '{topic}': {str(e)}")
+
+    return results
+
+
+def save_result_to_file(result: WebSearchResult, output_dir: str = "output") -> str:
+    """Save search result to file (optional utility).
+
+    Args:
+        result: The WebSearchResult to save
+        output_dir: Directory to save the file in
+
+    Returns:
+        Path to the saved file
+    """
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     safe_title = "".join(
         [c if c.isalnum() or c in [" ", "_"] else "_" for c in result.title]
     )
-    safe_title = safe_title[:50]  # constrain string length
+    safe_title = safe_title[:50]
     filename = f"{output_dir}/{safe_title}.json"
-
-    # save partial_result to file
-    # partial_result = result
 
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(result.model_dump(), f, ensure_ascii=False, indent=2)
 
-    print(f"result save to: {filename}")
     return filename
 
 
-async def process_all_titles(
-    titles: List[str], config: Optional[WebSearchConfig] = None
-):
-    """process_all_titles and save results to test/output directory"""
-    output_dir = "test/output"
-    agent = WebSearchAgent(config or DEFAULT_CONFIG)
-    results = []
+async def example_usage():
+    """Example showing how to use the WebSearchAgent."""
+    # Example 1: Basic usage with default configuration
+    result = await search_topic("Artificial Intelligence ethics", verbose=True)
+    print(f"Found {len(result.sections)} sections about AI ethics")
 
-    for i, title in enumerate(titles):
-        print(f"\nsolve title {i + 1}/{len(titles)}: {title}")
-        try:
-            result = await agent.search(title)
-            filename = save_result_to_file(result, output_dir)
-            results.append({"title": title, "file": filename})
-            print(f"complete: {title}")
-        except Exception as e:
-            print(f"wrong when resolving title  '{title}': {str(e)}")
-            results.append({"title": title, "error": str(e)})
-
-    # save summary file
-    summary_file = f"{output_dir}/process_summary.json"
-    with open(summary_file, "w", encoding="utf-8") as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
-
-    return results
-
-
-# Simple example usage - remains the same
-async def main():
-    # Code remains the same as before
-
-    config = WebSearchConfig(
-        llm_provider="openai",
-        planner_model="o1",
-        search_api="tavily",
-        search_api_config={"include_raw_content": True, "max_results": 3},
-        initial_queries_count=2,
-        section_queries_count=2,
-        max_sections=4,
+    # Example 2: Custom configuration
+    custom_config = WebSearchConfig(
+        planner_model="o1", initial_queries_count=3, max_sections=5
     )
-
-    # agent = WebSearchAgent(config)
-    await process_all_titles(ISSUE_TITLE, config)
-
-    # below is test for single title
-
-    # result = await agent.search("Advances in quantum computing algorithms")
-
-    # print(f"\nSearch results for: {result.title}")
-    # print(f"Initial queries: {[q.query for q in result.initial_queries]}")
-    # print("\nSections:")
-    # for i, section in enumerate(result.sections, 1):
-    #     print(f"{i}. {section.title}")
-    #     print(f"   Description: {section.description[:20]}...")
-    #     print(f"   Queries: {[q.query for q in section.search_queries]}")
-    #     # print search responses
-    #     # print(f"   Found {section.search_responses} results")
-    #     print(f"   Found {sum(len(r.results) for r in section.search_responses)} results")
-    #     # print first 10 search_responses
-    #     for i, response in enumerate(section.search_responses, 1):
-    #         print(f"   Response {i}: {response.query}")
-    #         for j, result in enumerate(response.results, 1):
-    #             if j > 2:
-    #                 break
-    #             print(f"      Result {j}: {result.title[:20]}...")
-    #     print("")
+    topics = ["Renewable energy advancements", "Future of remote work"]
+    results = await search_multiple_topics(
+        topics,
+        config=custom_config,
+        verbose=True,
+        save_output=True,
+        output_dir="custom_output",
+    )
+    # Example 3: Processing results
+    for result in results:
+        if isinstance(result, WebSearchResult):
+            print(f"\nTopic: {result.title}")
+            for section in result.sections:
+                print(f"- {section.title}")
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+def main():
+    asyncio.run(example_usage())

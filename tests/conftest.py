@@ -1,6 +1,6 @@
 import pytest
 
-from config import WebSearchConfig
+from src.web_search_agent.config import WebSearchConfig
 
 
 @pytest.fixture

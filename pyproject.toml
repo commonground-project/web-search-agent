@@ -1,3 +1,39 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "web-search-agent"
+version = "0.1.0"
+description = "An intelligent web search agent that provides structured results"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT License"}
+authors = [
+    {name = "leepokai", email = "kevin2005ha@gmail.com"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "open-deep-research",
+    "python-dotenv",
+    "langchain-openai",
+    "langchain-core",
+    "pydantic",
+    "tavily-python",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/leepokai/web-search-agent"
+"Bug Tracker" = "https://github.com/leepokai/web-search-agent/issues"
+
+[project.scripts]
+web-search-agent = "web_search_agent.agent:main"
+
 [tool.ruff]
 
 lint.fixable = ["ALL"]

@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
-from models import SearchResponse, SearchResult
+from ..models import SearchResponse, SearchResult
 
 # Try importing search libraries, provide graceful fallbacks
 try:
