@@ -20,13 +20,4 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.11",
-    install_requires=[
-        "open-deep-research",
-        "python-dotenv",
-        "langchain-openai",
-        "langchain-core",
-        "pydantic",
-        "tavily-python",
-        "dotenv",
-    ],
 )
