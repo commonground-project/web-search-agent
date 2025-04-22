@@ -50,3 +50,5 @@ __pycache__/
 web_search_agent.egg-info
 
 custom_output
+
+.pypirc

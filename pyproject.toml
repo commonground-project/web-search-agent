@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "web-search-agent"
-version = "0.1.0"
+version = "0.1.1"
 description = "An intelligent web search agent that provides structured results"
 readme = "README.md"
 requires-python = ">=3.11"

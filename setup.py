@@ -5,7 +5,6 @@ with open("README.md", "r", encoding="utf-8") as file:
 
 setup(
     name="web-search-agent",
-    version="0.1.0",
     author="leepokai",
     author_email="kevin2005ha@gmail.com",
     description="An intelligent web search agent that provides structured results",
@@ -28,5 +27,6 @@ setup(
         "langchain-core",
         "pydantic",
         "tavily-python",
+        "dotenv",
     ],
 )

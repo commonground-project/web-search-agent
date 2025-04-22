@@ -1,7 +1,5 @@
 """Web Search Agent - A modular web search and analysis tool."""
 
-__version__ = "0.1.0"
-
 from .agent import WebSearchAgent
 from .config import WebSearchConfig
 from .models import (
