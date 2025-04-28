@@ -46,3 +46,9 @@ __pycache__/
 .ruff_cache
 
 .pytest_cache
+
+web_search_agent.egg-info
+
+custom_output
+
+.pypirc

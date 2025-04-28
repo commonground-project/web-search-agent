@@ -1,8 +1,12 @@
+"""Configuration for WebSearchAgent."""
+
 from typing import Any, Dict, Optional
+
+from .prompts import must_cover_section_prompt
 
 
 class WebSearchConfig:
-    """Configuration for WebSearchAgent"""
+    """Configuration for WebSearchAgent."""
 
     def __init__(
         self,
@@ -18,7 +22,7 @@ class WebSearchConfig:
         # Control Parameters
         max_sections: int = 5,
         # Must cover section title prompt
-        must_cover_section_title: str = "1. Identify all key individuals, organizations, government agencies, or entities involved in the topic 2. Outline the different perspectives and viewpoints on the issue without making value judgments 3. Present important statistics, official data, or research findings that provide factual context",
+        must_cover_section_title: str = must_cover_section_prompt,
     ):
         """Initialize WebSearchAgent configuration.
 
@@ -30,11 +34,8 @@ class WebSearchConfig:
             initial_queries_count: Number of initial search queries to generate
             section_queries_count: Number of search queries per section
             max_sections: Maximum number of sections to generate
-            include_raw_content: Whether to include raw content in search results
+            must_cover_section_title: Prompt for must-cover sections
         """
-        self.llm_provider = llm_provider
-        self.planner_model = planner_model
-        self.search_api = search_api
         self.llm_provider = llm_provider
         self.planner_model = planner_model
         self.search_api = search_api
@@ -42,8 +43,10 @@ class WebSearchConfig:
             "include_raw_content": True,
             "max_results": 3,
         }
+        self.initial_queries_count = initial_queries_count
+        self.section_queries_count = section_queries_count
+        self.max_sections = max_sections
         self.must_cover_section_title = must_cover_section_title
 
 
-# Default configuration
 DEFAULT_CONFIG = WebSearchConfig()
