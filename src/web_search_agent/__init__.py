@@ -1,6 +1,6 @@
 """Web Search Agent - A modular web search and analysis tool."""
 
-from .agent import WebSearchAgent
+from .agent import WebSearchAgent, search_multiple_topics, search_topic
 from .config import WebSearchConfig
 from .models import (
     SearchQuery,
@@ -17,6 +17,6 @@ __all__ = [
     "SearchResponse",
     "Section",
     "WebSearchResult",
-    "process_title",
-    "process_all_titles",
+    "search_topic",
+    "search_multiple_topics",
 ]
