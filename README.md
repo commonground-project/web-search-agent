@@ -112,12 +112,73 @@ if __name__ == "__main__":
     asyncio.run(research_project())
 ```
 
+### Using Additional Context
+
+The `additional_info` parameter allows you to provide specific guidance to refine your search. This context is added to the query generation process to produce more targeted search queries.
+
+```python
+import asyncio
+from web_search_agent import search_topic
+
+async def focused_research():
+    # Basic topic with additional context
+    result = await search_topic(
+        topic="Renewable energy",
+        additional_info="Focus on developments after 2022, particularly in solar technology and battery storage. Include economic viability and government policies.",
+        verbose=True
+    )
+    
+    print(f"Topic: {result.title}")
+    for section in result.sections:
+        print(f"- {section.title}")
+
+# Run the async function
+asyncio.run(focused_research())
+```
+
+You can also use additional context when searching multiple topics:
+
+```python
+import asyncio
+from web_search_agent import search_multiple_topics
+
+async def multiple_focused_searches():
+    # Topics with corresponding additional context for each
+    topics = [
+        "Artificial Intelligence in healthcare",
+        "Remote work security risks"
+    ]
+    
+    additional_infos = [
+        "Focus on diagnostic applications, FDA approvals since 2021, and major hospital implementations",
+        "Include zero-trust security models, risks of personal devices on home networks, and best practices for secure remote access"
+    ]
+    
+    results = await search_multiple_topics(
+        topics=topics,
+        additional_infos=additional_infos,
+        verbose=True
+    )
+    
+    # Process results
+    for result in results:
+        if hasattr(result, 'title'):
+            print(f"\nTopic: {result.title}")
+            for section in result.sections:
+                print(f"- {section.title}")
+
+# Run the async function
+asyncio.run(multiple_focused_searches())
+```
+
 ### Command Line Usage
 
 ```bash
 # Basic usage
 web-search-agent
 
+# For more options
+web-search-agent --help
 ```
 
 ## API Reference
@@ -130,8 +191,10 @@ web-search-agent
 
 ### Key Functions
 
-- `search_topic(topic, config=None, verbose=False)`: Search for a single topic
-- `search_multiple_topics(topics, config=None, verbose=False, save_output=False)`: Search for multiple topics
+- `search_topic(topic, config=None, verbose=False, additional_info=None)`: Search for a single topic
+  - `additional_info`: Optional string providing additional context to guide the query generation
+- `search_multiple_topics(topics, config=None, verbose=False, save_output=False, additional_infos=None)`: Search for multiple topics
+  - `additional_infos`: Optional list of strings with additional context for each topic
 
 ## Configuration Options
 
