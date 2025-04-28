@@ -50,17 +50,34 @@ class WebSearchAgent:
                 f"LLM provider '{self.config.llm_provider}' not supported. Use 'openai'."
             )
 
-    async def _generate_queries(self, title: str, count: int) -> List[SearchQuery]:
-        """Generate search queries based on a title."""
+    async def _generate_queries(
+        self, title: str, count: int, additional_info: Optional[str] = None
+    ) -> List[SearchQuery]:
+        """Generate search queries based on a title and optional additional information.
+
+        Args:
+            title: The main topic to search
+            count: Number of queries to generate
+            additional_info: Optional additional context or constraints to guide query generation
+
+        Returns:
+            List of SearchQuery objects
+        """
+        # Prepare additional info prompt section if provided
+        additional_info_prompt = ""
+        if additional_info and additional_info.strip():
+            additional_info_prompt = f"\n\n4. Consider this additional context when generating queries:\n{additional_info}"
+
         # Use prompts from prompt.py
-        system_prompt = initial_query_system_prompt.format(count=count)
+        system_prompt = initial_query_system_prompt.format(
+            count=count, additional_info_prompt=additional_info_prompt
+        )
         human_prompt = initial_query_human_prompt.format(title=title)
 
         structured_llm = self.llm.with_structured_output(QueryList)
         response = structured_llm.invoke(
             [SystemMessage(content=system_prompt), HumanMessage(content=human_prompt)]
         )
-
         return response.queries
 
     async def _generate_sections(
@@ -140,7 +157,9 @@ class WebSearchAgent:
 
         return "\n".join(result)
 
-    async def search(self, title: str, verbose: bool = False) -> WebSearchResult:
+    async def search(
+        self, title: str, verbose: bool = False, additional_info: Optional[str] = None
+    ) -> WebSearchResult:
         """Execute the full search process for a given title.
 
         Args:
@@ -157,7 +176,7 @@ class WebSearchAgent:
         if verbose:
             print(f"Generating initial queries for: {title}")
         initial_queries = await self._generate_queries(
-            title, self.config.initial_queries_count
+            title, self.config.initial_queries_count, additional_info
         )
 
         # Step 2: Execute initial searches
@@ -201,7 +220,10 @@ class WebSearchAgent:
 
 
 async def search_topic(
-    topic: str, config: Optional[WebSearchConfig] = None, verbose: bool = False
+    topic: str,
+    config: Optional[WebSearchConfig] = None,
+    verbose: bool = False,
+    additional_info: Optional[str] = None,
 ) -> WebSearchResult:
     """Search for a single topic.
 
@@ -209,12 +231,13 @@ async def search_topic(
         topic: The topic to research
         config: Optional custom configuration
         verbose: Whether to print progress information
+        additional_info: Optional additional context to guide query generation
 
     Returns:
         WebSearchResult containing the research results
     """
     agent = WebSearchAgent(config or DEFAULT_CONFIG)
-    return await agent.search(topic, verbose=verbose)
+    return await agent.search(topic, verbose=verbose, additional_info=additional_info)
 
 
 async def search_multiple_topics(
@@ -223,6 +246,7 @@ async def search_multiple_topics(
     verbose: bool = False,
     save_output: bool = False,
     output_dir: str = "output",
+    additional_infos: Optional[List[str]] = None,
 ) -> List[Union[WebSearchResult, Dict[str, Any]]]:
     """Search for multiple topics.
 
@@ -232,6 +256,7 @@ async def search_multiple_topics(
         verbose: Whether to print progress information
         save_output: Whether to save results to files
         output_dir: Directory to save output files in
+        additional_infos: Optional list of additional contexts for each topic
 
     Returns:
         List of WebSearchResult objects or error dictionaries
@@ -242,9 +267,16 @@ async def search_multiple_topics(
     for i, topic in enumerate(topics):
         if verbose:
             print(f"\nResearching topic {i + 1}/{len(topics)}: {topic}")
-        try:
-            result = await agent.search(topic, verbose=verbose)
 
+        # Get additional info for this topic if available
+        additional_info = None
+        if additional_infos and i < len(additional_infos):
+            additional_info = additional_infos[i]
+
+        try:
+            result = await agent.search(
+                topic, verbose=verbose, additional_info=additional_info
+            )
             if save_output:
                 filename = save_result_to_file(result, output_dir)
                 if verbose:
@@ -294,19 +326,34 @@ async def example_usage():
     result = await search_topic("Artificial Intelligence ethics", verbose=True)
     print(f"Found {len(result.sections)} sections about AI ethics")
 
-    # Example 2: Custom configuration
+    # Example 2: With additional context
+    result_with_context = await search_topic(
+        "Climate change",
+        verbose=True,
+        additional_info="Focus on scientific consensus, recent developments since 2020, and impacts on agriculture",
+    )
+    print(f"Found {len(result_with_context.sections)} sections about climate change")
+
+    # Example 3: Custom configuration with multiple topics
     custom_config = WebSearchConfig(
         planner_model="o1", initial_queries_count=3, max_sections=5
     )
     topics = ["Renewable energy advancements", "Future of remote work"]
+    additional_infos = [
+        "Focus on solar, wind and hydrogen technologies developed after 2022",
+        "Include impacts of pandemic, trends in hybrid work models, and technology enablers",
+    ]
+
     results = await search_multiple_topics(
         topics,
         config=custom_config,
         verbose=True,
         save_output=True,
         output_dir="custom_output",
+        additional_infos=additional_infos,
     )
-    # Example 3: Processing results
+
+    # Example 4: Processing results
     for result in results:
         if isinstance(result, WebSearchResult):
             print(f"\nTopic: {result.title}")

@@ -5,6 +5,7 @@ The queries should:
 1. Be diverse to cover different aspects of the topic
 2. Be specific enough to return relevant results
 3. Use different phrasings to capture various sources
+{additional_info_prompt}
 
 Format your response as a JSON list of queries.
 """
